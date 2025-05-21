@@ -65,15 +65,24 @@ export class MovieDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    console.log('Route params:', this.route.snapshot.params);
+    console.log('Route paramMap:', this.route.snapshot.paramMap);
     const id = this.route.snapshot.paramMap.get('id');
+    console.log('Movie ID from route:', id);
+    console.log('Movie ID type:', typeof id);
     if (id) {
       this.loadMovie(+id);
+    } else {
+      console.error('No movie ID found in route parameters');
     }
   }
 
   loadMovie(id: number): void {
+    console.log('Loading movie with ID:', id);
+    console.log('ID type:', typeof id);
     this.movieService.getMovie(id).subscribe(
       (movie: Movie) => {
+        console.log('Movie loaded:', movie);
         this.movie = movie;
       },
       (error: Error) => {

@@ -14,8 +14,8 @@
     gap: 0.5rem;
     
     .logo {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       object-fit: contain;
     }
 
@@ -31,10 +31,10 @@
     transition: all 0.3s ease;
     color: #e5e5e5 !important;
     position: relative;
+    cursor: pointer;
 
     &:hover {
-      color: #e50914 !important;
-      transform: translateY(-1px);
+      color: #b82525 !important;
     }
 
     &::after {
@@ -52,13 +52,13 @@
     &:hover::after {
       width: 80%;
     }
-  }
 
-  .active {
-    color: #e50914 !important;
-    
-    &::after {
-      width: 80%;
+    &.active {
+      color: #e50914 !important;
+      
+      &::after {
+        width: 80%;
+      }
     }
   }
 
@@ -81,6 +81,7 @@
         color: #fff;
         padding: 0.5rem 1rem;
         width: 200px;
+        border-right: none;
 
         &::placeholder {
           color: rgba(255, 255, 255, 0.6);
@@ -88,6 +89,7 @@
 
         &:focus {
           box-shadow: none;
+          border-color: #ced4da;
         }
       }
 
@@ -97,6 +99,7 @@
         color: #fff;
         padding: 0.5rem 1rem;
         transition: all 0.3s ease;
+        border-left: none;
 
         &:hover {
           color: #e50914;
@@ -140,13 +143,15 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
 
       i {
         font-size: 1rem;
       }
 
       &:hover {
-        background: #e50914;
+        background-color: #f8f9fa;
         color: white;
         transform: translateX(5px);
       }
@@ -172,6 +177,14 @@
     .navbar-nav {
       margin-top: 1rem;
     }
+  }
+}
+
+.btn-outline-light {
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
   }
 }
 

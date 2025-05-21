@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { Movie } from '../models/movie.model';
 import { environment } from '../../../environments/environment';
 
-interface Pagination<T> {
+export interface Pagination<T> {
   pageNumber: number;
   pageSize: number;
   totalCount: number;
@@ -26,8 +26,11 @@ export class MovieService {
   ): Observable<Pagination<Movie>> {
     let params = new HttpParams()
       .set('pageNumber', pageNumber.toString())
-      .set('pageSize', pageSize.toString())
-      .set('sort', sortBy);
+      .set('pageSize', pageSize.toString());
+
+    if (sortBy) {
+      params = params.set('sort', sortBy);
+    }
 
     if (categoryId) {
       params = params.set('catId', categoryId.toString());

@@ -1,42 +1,60 @@
-<nav class="navbar navbar-expand-lg navbar-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a routerLink="/" class="navbar-brand">
-      <img src="./favicon.ico" class="logo" alt="">
-      <i class="text-white">Movies App</i>
+    <a routerLink="/" class="navbar-brand d-flex align-items-center">
+      <img src="./favicon.ico" class="logo me-2" alt="Movies App Logo">
+      <span class="fw-bold">Movies App</span>
     </a>
 
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav m-auto">
-        <li class="nav-item"><a href="" class="nav-link">Home</a></li>
-        <li class="nav-item"><a href="" class="nav-link">Movies</a></li>
-        <li class="nav-item"><a href="" class="nav-link">Favourite</a></li>
-        <li class="nav-item"><a href="" class="nav-link">About</a></li>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a [routerLink]="['/home']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">Home</a>
+        </li>
+        <li class="nav-item">
+          <a [routerLink]="['/movies']" routerLinkActive="active" class="nav-link">Movies</a>
+        </li>
+        <li class="nav-item">
+          <a [routerLink]="['/movies/favorites']" routerLinkActive="active" class="nav-link">Favorites</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [routerLink]="['/about']" routerLinkActive="active">About</a>
+        </li>
       </ul>
-      <form class="form-inline mx-auto">
-  <div class="input-group">
-    <input type="text" class="form-control text-white" style="background-color: black;" placeholder="Search ...">
-    <div class="input-group-append">
-      <button class="btn btn-light" type="submit">
-        <i class="material-icons">search</i>
-      </button>
-    </div>
-  </div>
-</form>
 
-       <ul class="navbar-nav ml-auto align-items-center">
-           <li class="nav-item"><a href="" class="nav-link">
-            <i class="material-icons">favorite</i>
-           </a></li>
-           <li class="nav-item"><a href="" class="nav-link dropdown-toggle">
-            <i class="material-icons">Account</i>
-           </a></li>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a href="" class="dropdown-item"><i class="fa fa-user-plus"></i>Register</a>
-          <a href="" class="dropdown-item"><i class="fa fa-sign-in"></i>Login</a>
+      <div class="d-flex align-items-center">
+        <a (click)="navigateToFavorites()" class="btn btn-outline-light me-2">
+          <i class="material-icons">favorite</i>
+        </a>
+        <div class="dropdown">
+          <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+            <i class="material-icons">account_circle</i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <ng-container *ngIf="!isAuthenticated()">
+              <li class="nav-item">
+                <a class="nav-link" [routerLink]="['/auth/login']" routerLinkActive="active">Login</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" [routerLink]="['/auth/register']" routerLinkActive="active">Register</a>
+              </li>
+            </ng-container>
+            <ng-container *ngIf="isAuthenticated()">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  {{ getCurrentUser()?.username || 'User' }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                  <li><a class="dropdown-item" href="#" (click)="logout()">Logout</a></li>
+                </ul>
+              </li>
+            </ng-container>
+          </ul>
         </div>
-
-       </ul>
-
+      </div>
     </div>
   </div>
 </nav>

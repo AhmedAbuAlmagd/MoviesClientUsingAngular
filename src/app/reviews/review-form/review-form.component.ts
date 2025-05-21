@@ -1,7 +1,8 @@
+import { AddReviewDTO } from './../../models/review.model';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ReviewService } from '../../../core/services/review.service';
-import { Review } from '../../../models/review.model';
+import { ReviewService } from '../../../app/core/services/review.service';
+import { Review } from '../../../app/models/review.model';
 
 @Component({
   selector: 'app-review-form',
@@ -66,23 +67,27 @@ export class ReviewFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.reviewForm.valid) {
-      const reviewData = {
-        ...this.reviewForm.value,
-        movieId: this.movieId
-      };
+  if (this.reviewForm.valid) {
+    const reviewValue = this.reviewForm.value;
 
-      if (this.isEditMode && this.review) {
-        this.reviewService.update({ ...reviewData, id: this.review.id }).subscribe(() => {
-          this.reviewAdded.emit();
-          this.reviewForm.reset();
-        });
-      } else {
-        this.reviewService.add(reviewData).subscribe(() => {
-          this.reviewAdded.emit();
-          this.reviewForm.reset();
-        });
-      }
+    if (this.isEditMode && this.review) {
+      this.reviewService.updateReview(this.review!.id!, {
+        rating: reviewValue.rating,
+        comment: reviewValue.comment
+      }).subscribe(() => {
+        this.reviewAdded.emit();
+        this.reviewForm.reset();
+      });
+    } else {
+      this.reviewService.createReview(this.movieId, {
+        rating: reviewValue.rating,
+        comment: reviewValue.comment
+      }).subscribe(() => {
+        this.reviewAdded.emit();
+        this.reviewForm.reset();
+      });
     }
   }
-} 
+}
+
+}
