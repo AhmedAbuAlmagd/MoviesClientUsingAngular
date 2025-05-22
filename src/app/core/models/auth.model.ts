@@ -4,19 +4,25 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  username: string;
+  userName: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 export interface AuthResponse {
+  message: string;
+  isAuthenticated: boolean;
+  userName: string;
+  email: string;
+  roles: string[];
   token: string;
-  user: User;
+  expiresOn: Date;
 }
 
 export interface User {
-  id: number;
+  id?: number;
   username: string;
   email: string;
-  role: string;
+  roles: string[];
 } 

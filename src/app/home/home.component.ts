@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
   selector: 'app-home',
   template: `
     <!-- Hero Section -->
+
+    <div class="container-fluid mx-4">
     <div class="hero-section">
       <div class="hero-content">
         <h1 class="hero-title">Welcome to Movies App</h1>
@@ -29,9 +31,9 @@ import { Router } from '@angular/router';
 
     <!-- Featured Movies Section -->
     <section class="featured-section">
-      <div class="container">
+      <div class="container-fluid px-0">
         <div class="section-header">
-          <h2>Featured Movies</h2>
+          <h2 style="color:white">Featured Movies</h2>
           <a [routerLink]="['/movies']" class="view-all">View All <i class="material-icons">arrow_forward</i></a>
         </div>
         <div class="featured-slider">
@@ -39,7 +41,7 @@ import { Router } from '@angular/router';
             <div class="col-md-4" *ngFor="let movie of featuredMovies">
               <div class="movie-card featured">
                 <div class="movie-poster">
-                  <img src="assets/IbrahimAlabyad.jpg" [alt]="movie.title">
+                  <img src="{{movie.poster}}" [alt]="movie.title">
                   <div class="movie-rating">
                     <i class="material-icons">star</i>
                     <span>{{ movie.rating }}/10</span>
@@ -76,6 +78,7 @@ import { Router } from '@angular/router';
         </div>
       </div>
     </section>
+    </div>
   `,
   styles: [`
     .hero-section {
