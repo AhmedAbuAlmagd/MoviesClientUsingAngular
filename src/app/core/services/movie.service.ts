@@ -33,6 +33,7 @@ export class MovieService {
     }
 
     if (categoryId) {
+      console.log('Setting category ID:', categoryId); // Debug log
       params = params.set('catId', categoryId.toString());
     }
 
@@ -40,6 +41,7 @@ export class MovieService {
       params = params.set('searchWord', searchTerm.trim());
     }
 
+    console.log('Request params:', params.toString()); // Debug log
     return this.http.get<Pagination<Movie>>(`${environment.apiUrl}/api/movie/getall`, { params });
   }
 

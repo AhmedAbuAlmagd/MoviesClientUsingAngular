@@ -12,7 +12,7 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
       <!-- Hero Section -->
       <div class="hero-section">
         <div class="hero-content">
-          <h1 class="hero-title">Discover Movies</h1>
+          <h1 class="hero-bigtitle">Discover Movies</h1>
           <p class="hero-subtitle">Find and explore your favorite movies</p>
         </div>
       </div>
@@ -161,6 +161,18 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     }
 
+
+    .hero-bigtitle {
+      font-size: 4rem;
+      font-weight: 900;
+      margin-bottom: 1.5rem;
+      color: #edebeb;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+
+    
     .search-box, .select-box {
       background: rgba(255, 255, 255, 0.1);
       border-radius: 50px;
@@ -341,11 +353,20 @@ export class MovieListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
+    
+    // Subscribe to query parameter changes
     this.route.queryParams.subscribe(params => {
-      this.pagination.pageNumber = +params['page'] || 1;
-      this.selectedCategory = params['category'] || '';
-      this.searchQuery = params['search'] || '';
-      this.sortBy = params['sort'] || 'RatingDesc';
+      if (params['category']) {
+        this.selectedCategory = params['category'];
+      } else {
+        this.selectedCategory = '';
+      }
+      if (params['page']) {
+        this.pagination.pageNumber = +params['page'];
+      }
+      if (params['sort']) {
+        this.sortBy = params['sort'];
+      }
       this.loadMovies();
     });
   }
@@ -355,7 +376,7 @@ export class MovieListComponent implements OnInit {
       this.pagination.pageNumber,
       this.pagination.pageSize,
       this.searchQuery,
-      +this.selectedCategory || undefined,
+      this.selectedCategory ? parseInt(this.selectedCategory) : undefined,
       this.sortBy
     ).subscribe({
       next: (response: Pagination<Movie>) => {
@@ -392,8 +413,10 @@ export class MovieListComponent implements OnInit {
   }
 
   onCategoryChange(): void {
-    this.pagination.pageNumber = 1;
-    this.loadMovies();
+    console.log('Category changed to:', this.selectedCategory); // Debug log
+    this.pagination.pageNumber = 1; // Reset to first page when category changes
+    this.loadMovies(); // Load movies first
+    this.updateQueryParams(); // Then update URL
   }
 
   onSortChange(): void {
@@ -409,17 +432,19 @@ export class MovieListComponent implements OnInit {
   }
 
   private updateQueryParams(): void {
-    const queryParams = {
+    const queryParams: any = {
       page: this.pagination.pageNumber,
-      category: this.selectedCategory || null,
-      search: this.searchQuery || null,
       sort: this.sortBy
     };
-    
+
+    if (this.selectedCategory) {
+      queryParams.category = this.selectedCategory;
+    }
+
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams,
-      queryParamsHandling: 'merge'
+      queryParams: queryParams,
+      replaceUrl: true
     });
   }
 

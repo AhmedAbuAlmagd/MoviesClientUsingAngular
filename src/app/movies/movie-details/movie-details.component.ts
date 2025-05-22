@@ -31,8 +31,10 @@ import { AuthService } from '../../core/services/auth.service';
                   Released: {{movie.releaseDate | date}}
                 </p>
                 <div class="movie-categories">
-                  <span class="category-badge" *ngFor="let category of movie.categories">
-                    {{category.name}}
+                  <span *ngFor="let category of movie.categories"
+                        class="category-badge">
+                    <i class="material-icons">{{ getCategoryIcon(category.name) }}</i>
+                    <span>{{category.name}}</span>
                   </span>
                 </div>
                 <p class="movie-description">{{movie.description}}</p>
@@ -49,7 +51,7 @@ import { AuthService } from '../../core/services/auth.service';
           </div>
         </div>
       </div>
-
+  
       <!-- Trailer Section -->
       <section class="trailer-section" *ngIf="movie.trailer">
         <div class="container">
@@ -80,142 +82,331 @@ import { AuthService } from '../../core/services/auth.service';
     .movie-details-container {
       background: #141414;
       color: white;
+      min-height: 100vh;
     }
 
     .hero-section {
-      background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)),
+      background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)),
                   url('/assets/images/hero-bg.jpg') center/cover;
-      padding: 4rem 0;
-      margin-bottom: 2rem;
+      padding: 8rem 0;
+      margin-bottom: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #e50914, transparent);
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.5);
+    }
+
+    .hero-section::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 150px;
+      background: linear-gradient(to top, #141414, transparent);
     }
 
     .hero-content {
       padding: 2rem 0;
+      position: relative;
+      z-index: 1;
     }
 
     .movie-poster {
       position: relative;
-      border-radius: 10px;
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      transition: all 0.4s ease;
+      transform: perspective(1000px) rotateY(-5deg);
+    }
+
+    .movie-poster:hover {
+      transform: perspective(1000px) rotateY(0deg) scale(1.02);
+      box-shadow: 0 20px 50px rgba(229, 9, 20, 0.3);
     }
 
     .movie-poster img {
       width: 100%;
       height: auto;
-      transition: transform 0.3s ease;
-    }
-
-    .movie-poster:hover img {
-      transform: scale(1.05);
+      display: block;
     }
 
     .movie-rating {
       position: absolute;
-      top: 1rem;
-      right: 1rem;
-      background: rgba(0, 0, 0, 0.8);
+      top: 1.5rem;
+      right: 1.5rem;
+      background: rgba(0, 0, 0, 0.9);
       color: #ffd700;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
+      padding: 1rem 1.5rem;
+      border-radius: 30px;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 1rem;
+      font-weight: 700;
+      font-size: 1.3rem;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .movie-rating .material-icons {
+      font-size: 1.4rem;
+      color: #ffd700;
     }
 
     .movie-title {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
+      font-size: 4rem;
+      font-weight: 900;
+      margin-bottom: 1.5rem;
       color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #fff, #e50914);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .movie-release-date {
       color: #999;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.8rem;
+      font-size: 1.1rem;
+    }
+
+    .movie-release-date .material-icons {
+      color: #e50914;
     }
 
     .movie-categories {
-      margin-bottom: 1.5rem;
+      margin-bottom: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .category-badge {
+      background: rgba(229, 9, 20, 0.15);
+      color: #e50914;
+      padding: 0.8rem 1.5rem;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: 2px solid #e50914;
+      transition: all 0.4s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .category-badge::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: #e50914;
+      transform: translateX(-100%);
+      transition: transform 0.4s ease;
+      z-index: 0;
+    }
+
+    .category-badge:hover {
       color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      margin-right: 0.5rem;
-      font-size: 0.9rem;
-      display: inline-block;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+    }
+
+    .category-badge:hover::before {
+      transform: translateX(0);
+    }
+
+    .category-badge i,
+    .category-badge span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .category-badge i {
+      font-size: 1.2rem;
     }
 
     .movie-description {
       color: #ccc;
-      font-size: 1.1rem;
-      line-height: 1.6;
-      margin-bottom: 2rem;
+      font-size: 1.2rem;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+      max-width: 800px;
     }
 
     .movie-actions {
-      margin-top: 2rem;
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
     }
 
     .movie-actions .btn {
-      padding: 0.75rem 1.5rem;
+      padding: 0.8rem 1.5rem;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.8rem;
+      font-weight: 600;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .movie-actions .btn-outline-light {
+      border: 2px solid white;
+    }
+
+    .movie-actions .btn-outline-light:hover {
+      background: white;
+      color: #141414;
+      transform: translateY(-2px);
+    }
+
+    .movie-actions .btn-danger {
+      background: #e50914;
+      border: 2px solid #e50914;
+    }
+
+    .movie-actions .btn-danger:hover {
+      background: #b82525;
+      border-color: #b82525;
+      transform: translateY(-2px);
     }
 
     .section-header {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 2rem;
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+      position: relative;
     }
 
     .section-header h2 {
-      font-size: 2rem;
-      font-weight: 700;
+      font-size: 3rem;
+      font-weight: 900;
       margin: 0;
       color: white;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(to right, #fff, #e50914);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-header .material-icons {
+      font-size: 3rem;
+      color: #e50914;
+      filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.5));
     }
 
     .trailer-section {
-      padding: 4rem 0;
+      padding: 6rem 0;
       background: #1a1a1a;
+      position: relative;
+    }
+
+    .trailer-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #e50914, transparent);
     }
 
     .trailer-container {
-      border-radius: 10px;
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      aspect-ratio: 16/9;
+    }
+
+    .trailer-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .reviews-section {
-      padding: 4rem 0;
+      padding: 8rem 0;
+      background: #141414;
+      position: relative;
+    }
+
+    .reviews-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, #e50914, transparent);
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
     }
 
     .review-form-container {
-      background: #1a1a1a;
-      padding: 2rem;
-      border-radius: 10px;
+      background: rgba(26, 26, 26, 0.95);
+      padding: 3rem;
+      border-radius: 25px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      margin-bottom: 4rem;
+      border: 1px solid rgba(229, 9, 20, 0.1);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .review-form-container:hover {
+      box-shadow: 0 20px 50px rgba(229, 9, 20, 0.2);
+      border-color: rgba(229, 9, 20, 0.2);
     }
 
     @media (max-width: 768px) {
-      .movie-title {
-        font-size: 2rem;
+      .hero-section {
+        padding: 6rem 0;
       }
 
-      .hero-section {
-        padding: 2rem 0;
+      .movie-title {
+        font-size: 2.8rem;
       }
 
       .movie-poster {
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        transform: none;
+      }
+
+      .movie-poster:hover {
+        transform: scale(1.02);
+      }
+
+      .section-header h2 {
+        font-size: 2.2rem;
+      }
+
+      .review-form-container {
+        padding: 2rem;
       }
     }
   `]
@@ -262,7 +453,6 @@ export class MovieDetailsComponent implements OnInit {
     if (this.movie) {
       this.reviewService.getMovieReviews(this.movie.id).subscribe(
         (reviews: Review[]) => {
-          // Reviews are handled by the ReviewListComponent
         },
         (error: Error) => {
           console.error('Error loading reviews:', error);
@@ -290,5 +480,26 @@ export class MovieDetailsComponent implements OnInit {
 
   isAuthenticated(): boolean {
     return this.authService.isAuthenticated();
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    switch (categoryName.toLowerCase()) {
+      case 'action':
+        return 'local_fire_department';
+      case 'comedy':
+        return 'sentiment_very_satisfied';
+      case 'drama':
+        return 'theater_comedy';
+      case 'horror':
+        return 'ghost';
+      case 'romance':
+        return 'favorite';
+      case 'sci-fi':
+        return 'rocket';
+      case 'thriller':
+        return 'psychology';
+      default:
+        return 'local_movies';
+    }
   }
 }

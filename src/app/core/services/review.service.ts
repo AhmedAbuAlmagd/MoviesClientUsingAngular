@@ -11,7 +11,7 @@ export class ReviewService {
   constructor(private http: HttpClient) { }
 
   getMovieReviews(movieId: number): Observable<Review[]> {
-    return this.http.get<Review[]>(`${environment.apiUrl}/api/review/getall/${movieId}`);
+    return this.http.get<Review[]>(`${environment.apiUrl}/api/review/getall?movieId=${movieId}`);
   }
 
   createReview(movieId: number, review: { rating: number; comment: string }): Observable<Review> {
@@ -23,6 +23,6 @@ export class ReviewService {
   }
 
   deleteReview(reviewId: number): Observable<void> {
-    return this.http.delete<void>(`${environment.apiUrl}/api/review/delete/${reviewId}`);
+    return this.http.delete<void>(`${environment.apiUrl}/api/review/delete?movieId=${reviewId}`);
   }
 } 
