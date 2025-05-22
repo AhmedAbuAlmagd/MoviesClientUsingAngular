@@ -10,6 +10,16 @@ html, body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* Container Override */
+.container {
+  max-width: 1600px !important;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
 /* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 8px;

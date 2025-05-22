@@ -36,8 +36,8 @@ export class MovieService {
       params = params.set('catId', categoryId.toString());
     }
 
-    if (searchTerm) {
-      params = params.set('searchWord', searchTerm);
+    if (searchTerm && searchTerm.trim()) {
+      params = params.set('searchWord', searchTerm.trim());
     }
 
     return this.http.get<Pagination<Movie>>(`${environment.apiUrl}/api/movie/getall`, { params });

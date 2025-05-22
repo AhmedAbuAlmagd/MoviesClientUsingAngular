@@ -3,8 +3,17 @@ body,app-root {
     padding: 0;
   }
   
+  :host {
+    display: block;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+  
   .container {
-    max-width: 100%;
-    padding: 0 15px;
-    margin: 0 auto;
+    max-width: 1400px;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
   }

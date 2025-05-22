@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   template: `
     <app-nav-bar></app-nav-bar>
-    <div class="container mt-4">
+    <div class="container-fluid px-4">
       <router-outlet></router-outlet>
     </div>
   `

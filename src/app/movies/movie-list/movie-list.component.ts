@@ -66,7 +66,7 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
       <section class="movies-section">
         <div class="container">
           <div class="row g-4">
-            <div class="col-md-4 col-lg-3" *ngFor="let movie of movies">
+            <div class="col-md-4" *ngFor="let movie of movies">
               <div class="movie-card">
                 <div class="movie-poster">
                   <img [src]="movie.poster" [alt]="movie.title">
@@ -366,6 +366,8 @@ export class MovieListComponent implements OnInit {
           totalCount: response.totalCount,
           data: response.data
         };
+        
+        this.updateQueryParams();
       },
       error: (error: Error) => {
         console.error('Error loading movies:', error);
@@ -386,23 +388,23 @@ export class MovieListComponent implements OnInit {
 
   onSearch(): void {
     this.pagination.pageNumber = 1;
-    this.updateQueryParams();
+    this.loadMovies();
   }
 
   onCategoryChange(): void {
     this.pagination.pageNumber = 1;
-    this.updateQueryParams();
+    this.loadMovies();
   }
 
   onSortChange(): void {
     this.pagination.pageNumber = 1;
-    this.updateQueryParams();
+    this.loadMovies();
   }
 
   onPageChange(page: number): void {
     if (page >= 1 && page <= this.getTotalPages()) {
       this.pagination.pageNumber = page;
-      this.updateQueryParams();
+      this.loadMovies();
     }
   }
 
@@ -425,6 +427,9 @@ export class MovieListComponent implements OnInit {
     const totalPages = this.getTotalPages();
     const pages: number[] = [];
     const maxPages = 5;
+    
+    if (totalPages <= 0) return pages;
+
     let start = Math.max(1, this.pagination.pageNumber - Math.floor(maxPages / 2));
     let end = Math.min(totalPages, start + maxPages - 1);
 

@@ -7,6 +7,15 @@
   top: 0;
   z-index: 1000;
 
+  .container {
+    max-width: 1400px;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
   .navbar-brand {
     font-size: 1.5rem;
     color: white !important;
