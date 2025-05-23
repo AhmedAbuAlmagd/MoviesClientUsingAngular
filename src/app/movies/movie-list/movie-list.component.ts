@@ -52,9 +52,9 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
                 </div>
               </div>
               <div class="col-md-2" *ngIf="isAdmin()">
-                <button class="btn btn-danger w-100" routerLink="/movies/add">
+                <button class="action-btn add-btn" routerLink="/movies/add">
                   <i class="material-icons">add</i>
-                  Add Movie
+                  <span>Add Movie</span>
                 </button>
               </div>
             </div>
@@ -78,10 +78,22 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
                 <div class="movie-info">
                   <h3 class="movie-title">{{ movie.title }}</h3>
                   <p class="movie-description">{{ movie.description | slice:0:100 }}...</p>
-                  <button class="btn btn-outline-danger w-100" (click)="viewMovieDetails(movie)">
-                    <i class="material-icons">visibility</i>
-                    View Details
-                  </button>
+                  <div class="movie-actions">
+                    <button class="action-btn view-btn" (click)="viewMovieDetails(movie)">
+                      <i class="material-icons">visibility</i>
+                      <span>View Details</span>
+                    </button>
+                    <div class="admin-actions" *ngIf="isAdmin()">
+                      <button class="action-btn edit-btn" (click)="editMovie(movie)">
+                        <i class="material-icons">edit</i>
+                        <span>Edit Movie</span>
+                      </button>
+                      <button class="action-btn delete-btn" (click)="deleteMovie(movie)">
+                        <i class="material-icons">delete</i>
+                        <span>Delete Movie</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -311,6 +323,83 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
       font-size: 0.9rem;
     }
 
+    .movie-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .admin-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: transparent;
+      color: white;
+    }
+
+    .action-btn i {
+      font-size: 1.2rem;
+    }
+
+    .view-btn {
+      background-color:rgb(68, 79, 91);
+      color: white;
+    }
+
+    .view-btn:hover {
+      background-color: #2c3e50;
+      border-color: #2c3e50;
+    }
+
+    .edit-btn {
+      background-color:rgb(89, 172, 227);
+      color: white;
+    }
+
+    .edit-btn:hover {
+      background-color: #3498db;
+      border-color: #3498db;
+    }
+
+    .delete-btn {
+      background-color:rgb(197, 110, 100);
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background-color: #e74c3c;
+      border-color: #e74c3c;
+    }
+
+    .add-btn
+    {
+     background-color:rgb(67, 113, 81);
+      border-color:rgb(67, 113, 81);
+    }
+    .add-btn:hover {
+      background-color:green;
+      border-color:green;
+    }
+
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+
     @media (max-width: 768px) {
       .hero-title {
         font-size: 2rem;
@@ -327,6 +416,92 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
       .movie-poster img {
         height: 300px;
       }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #1a1a1a;
+      padding: 2rem;
+      border-radius: 15px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(229, 9, 20, 0.2);
+    }
+
+    .modal-title {
+      color: #e50914;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-title::before {
+      content: 'warning';
+      font-family: 'Material Icons';
+      font-size: 1.8rem;
+    }
+
+    .modal-message {
+      color: #fff;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .modal-warning {
+      color: #e50914 !important;
+      font-size: 0.9rem !important;
+      margin-top: 1rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+      justify-content: flex-end;
+    }
+
+    .modal-button {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 100px;
+    }
+
+    .modal-button-cancel {
+      background: #333;
+      color: white;
+    }
+
+    .modal-button-cancel:hover {
+      background: #444;
+    }
+
+    .modal-button-delete {
+      background: #e50914;
+      color: white;
+    }
+
+    .modal-button-delete:hover {
+      background: #b82525;
     }
   `]
 })
@@ -480,4 +655,38 @@ export class MovieListComponent implements OnInit {
   isAdmin(): boolean {
     return this.authService.isAdmin();
   }
+
+
+  deleteMovie(movie: Movie): void {
+    if (confirm(`Are you sure you want to delete "${movie.title}"?`)) {
+      this.movieService.deleteMovie(movie.id).subscribe({
+        next: (response: any) => {
+          this.movies = this.movies.filter(m => m.id !== movie.id);
+          this.pagination.totalCount--;
+          if (this.movies.length === 0 && this.pagination.pageNumber > 1) {
+            this.pagination.pageNumber--;
+          }
+          this.loadMovies();
+        },
+        error: (error: any) => {
+          if (error.status === 200) {
+            this.movies = this.movies.filter(m => m.id !== movie.id);
+            this.pagination.totalCount--;
+            if (this.movies.length === 0 && this.pagination.pageNumber > 1) {
+              this.pagination.pageNumber--;
+            }
+            this.loadMovies();
+          } else {
+            alert('Error deleting movie. Please try again.');
+          }
+        }
+      });
+    }
+  }
+
+  editMovie(movie: Movie): void {
+    this.router.navigate(['/movies/edit', movie.id]);
+  }
 }
+
+    

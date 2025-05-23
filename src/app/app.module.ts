@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CoreModule } from './core/core.module';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -43,9 +44,9 @@ import { AuthService } from './core/services/auth.service';
       { path: 'home', component: HomeComponent },
       { path: 'movies', component: MovieListComponent },
       { path: 'movies/favorites', component: MovieListComponent },
-      { path: 'movies/:id', component: MovieDetailsComponent },
       { path: 'movies/add', component: MovieFormComponent },
       { path: 'movies/edit/:id', component: MovieFormComponent },
+      { path: 'movies/:id', component: MovieDetailsComponent },
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       { path: 'about-us', component: HomeComponent },
@@ -56,7 +57,12 @@ import { AuthService } from './core/services/auth.service';
     MovieService,
     CategoryService,
     ReviewService,
-    AuthService
+    AuthService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

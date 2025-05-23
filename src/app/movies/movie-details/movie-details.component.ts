@@ -413,6 +413,7 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class MovieDetailsComponent implements OnInit {
   movie?: Movie;
+  loading = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -423,30 +424,34 @@ export class MovieDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log('Route params:', this.route.snapshot.params);
-    console.log('Route paramMap:', this.route.snapshot.paramMap);
-    const id = this.route.snapshot.paramMap.get('id');
-    console.log('Movie ID from route:', id);
-    console.log('Movie ID type:', typeof id);
-    if (id) {
-      this.loadMovie(+id);
-    } else {
-      console.error('No movie ID found in route parameters');
-    }
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (id && id !== 'add') {
+        this.loadMovie(+id);
+      } else {
+        // If we're in add mode, redirect to the form
+        this.router.navigate(['/movies/form/add']);
+      }
+    });
   }
 
   loadMovie(id: number): void {
-    console.log('Loading movie with ID:', id);
-    console.log('ID type:', typeof id);
-    this.movieService.getMovie(id).subscribe(
-      (movie: Movie) => {
-        console.log('Movie loaded:', movie);
+    if (isNaN(id)) {
+      console.error('Invalid movie ID');
+      return;
+    }
+
+    this.movieService.getMovie(id).subscribe({
+      next: (movie: Movie) => {
         this.movie = movie;
+        this.loading = false;
       },
-      (error: Error) => {
+      error: (error: any) => {
         console.error('Error loading movie:', error);
+        this.loading = false;
+        // Handle error appropriately
       }
-    );
+    });
   }
 
   loadReviews(): void {
