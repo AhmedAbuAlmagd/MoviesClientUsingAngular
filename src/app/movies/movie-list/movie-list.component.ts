@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MovieService } from '../../core/services/movie.service';
 import { CategoryService } from '../../core/services/category.service';
 import { AuthService } from '../../core/services/auth.service';
+import { WatchlistService } from '../../core/services/watchlist.service';
 import { Movie, Category, Pagination } from '../../core/models/movie.model';
 
 @Component({
@@ -67,19 +68,29 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
         <div class="container">
           <div class="row g-4">
             <div class="col-md-4" *ngFor="let movie of movies">
-              <div class="movie-card">
+              <div class="movie-card" [class.admin]="isAdmin()">
                 <div class="movie-poster">
                   <img [src]="movie.poster" [alt]="movie.title">
                   <div class="movie-rating">
                     <i class="material-icons">star</i>
                     <span>{{ movie.rating }}/10</span>
                   </div>
+                  <div class="movie-actions-overlay">
+                    <button *ngIf="authService.currentUser$ | async"
+                            class="watchlist-btn"
+                            [class.active]="watchlistStatus[movie.id]"
+                            (click)="toggleWatchlist(movie.id)">
+                      <i class="material-icons">{{ watchlistStatus[movie.id] ? 'favorite' : 'favorite_border' }}</i>
+                    </button>
+                  </div>
                 </div>
                 <div class="movie-info">
                   <h3 class="movie-title">{{ movie.title }}</h3>
                   <p class="movie-description">{{ movie.description | slice:0:100 }}...</p>
                   <div class="movie-actions">
-                    <button class="action-btn view-btn" (click)="viewMovieDetails(movie)">
+                    <button *ngIf="!isAdmin()"
+                            class="action-btn view-btn"
+                            (click)="viewMovieDetails(movie)">
                       <i class="material-icons">visibility</i>
                       <span>View Details</span>
                     </button>
@@ -357,13 +368,35 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
     }
 
     .view-btn {
-      background-color:rgb(68, 79, 91);
+      background-color: rgb(68, 79, 91);
       color: white;
     }
 
     .view-btn:hover {
       background-color: #2c3e50;
       border-color: #2c3e50;
+    }
+
+    /* New styles for non-admin view button */
+    .movie-card:not(.admin) .view-btn {
+      background: rgba(229, 9, 20, 0.1);
+      color: #e50914;
+      border: 2px solid #e50914;
+      border-radius: 30px;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .movie-card:not(.admin) .view-btn:hover {
+      background: #e50914;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+    }
+
+    .movie-card:not(.admin) .view-btn i {
+      font-size: 1.2rem;
     }
 
     .edit-btn {
@@ -503,6 +536,45 @@ import { Movie, Category, Pagination } from '../../core/models/movie.model';
     .modal-button-delete:hover {
       background: #b82525;
     }
+
+    .movie-actions-overlay {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 2;
+    }
+
+    .watchlist-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      padding: 1rem 2rem;
+      background: rgba(229, 9, 20, 0.1);
+      color: #e50914;
+      border: 2px solid #e50914;
+      border-radius: 30px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #e50914;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4);
+      }
+
+      &.active {
+        background: #e50914;
+        color: white;
+      }
+
+      i {
+        font-size: 1.2rem;
+      }
+    }
   `]
 })
 export class MovieListComponent implements OnInit {
@@ -517,13 +589,15 @@ export class MovieListComponent implements OnInit {
     totalCount: 0,
     data: []
   };
+  watchlistStatus: { [key: number]: boolean } = {};
 
   constructor(
     private movieService: MovieService,
     private categoryService: CategoryService,
-    private authService: AuthService,
+    public authService: AuthService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private watchlistService: WatchlistService
   ) { }
 
   ngOnInit(): void {
@@ -564,6 +638,9 @@ export class MovieListComponent implements OnInit {
         };
         
         this.updateQueryParams();
+        if (this.authService.currentUser$) {
+          this.checkWatchlistStatus();
+        }
       },
       error: (error: Error) => {
         console.error('Error loading movies:', error);
@@ -656,7 +733,6 @@ export class MovieListComponent implements OnInit {
     return this.authService.isAdmin();
   }
 
-
   deleteMovie(movie: Movie): void {
     if (confirm(`Are you sure you want to delete "${movie.title}"?`)) {
       this.movieService.deleteMovie(movie.id).subscribe({
@@ -687,6 +763,44 @@ export class MovieListComponent implements OnInit {
   editMovie(movie: Movie): void {
     this.router.navigate(['/movies/edit', movie.id]);
   }
-}
 
-    
+  checkWatchlistStatus(): void {
+    this.movies.forEach(movie => {
+      this.watchlistService.isInWatchlist(movie.id).subscribe({
+        next: (isInWatchlist: boolean) => {
+          this.watchlistStatus[movie.id] = isInWatchlist;
+        },
+        error: (error: any) => {
+          console.error('Error checking watchlist status:', error);
+        }
+      });
+    });
+  }
+
+  toggleWatchlist(movieId: number): void {
+    if (!this.authService.currentUser$) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.watchlistStatus[movieId]) {
+      this.watchlistService.removeFromWatchlist(movieId).subscribe({
+        next: () => {
+          this.watchlistStatus[movieId] = false;
+        },
+        error: (error: any) => {
+          console.error('Error removing from watchlist:', error);
+        }
+      });
+    } else {
+      this.watchlistService.addToWatchlist(movieId).subscribe({
+        next: () => {
+          this.watchlistStatus[movieId] = true;
+        },
+        error: (error: any) => {
+          console.error('Error adding to watchlist:', error);
+        }
+      });
+    }
+  }
+}

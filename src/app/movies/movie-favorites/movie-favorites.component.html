@@ -1,0 +1,72 @@
+<div class="favorites-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-title">My Favorites</h1>
+      <p class="hero-subtitle">Your personal collection of favorite movies</p>
+    </div>
+  </div>
+
+  <!-- Movies Grid -->
+  <section class="movies-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-12" *ngIf="isLoading">
+          <div class="loading-spinner">
+            <i class="material-icons">movie</i>
+            <span>Loading favorites...</span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="error">
+          <div class="error-message">
+            <i class="material-icons">error</i>
+            <span>{{error}}</span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="!isLoading && !error && movies.length === 0">
+          <div class="empty-state">
+            <i class="material-icons">favorite_border</i>
+            <h2>No Favorites Yet</h2>
+            <p>Start adding movies to your favorites to see them here!</p>
+            <a routerLink="/movies" class="btn btn-primary">
+              <i class="material-icons">movie</i>
+              Browse Movies
+            </a>
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3" *ngFor="let movie of movies">
+          <div class="movie-card">
+            <div class="movie-poster">
+              <img [src]="movie.poster" [alt]="movie.title">
+              <div class="movie-rating">
+                <i class="material-icons">star</i>
+                <span>{{movie.rating}}/10</span>
+              </div>
+              <div class="movie-actions">
+                <button class="btn btn-icon btn-danger" (click)="removeFromFavorites(movie.id)">
+                  <i class="material-icons">favorite</i>
+                </button>
+              </div>
+            </div>
+            <div class="movie-info">
+              <h3 class="movie-title">{{movie.title}}</h3>
+              <p class="movie-release-date">
+                <i class="material-icons">calendar_today</i>
+                {{movie.releaseDate | date}}
+              </p>
+              <div class="movie-categories">
+                <span *ngFor="let category of movie.categories" class="category-badge">
+                  {{category.name}}
+                </span>
+              </div>
+              <p class="movie-description">{{movie.description | slice:0:100}}...</p>
+              <a [routerLink]="['/movies', movie.id]" class="btn btn-primary">
+                View Details
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div> 

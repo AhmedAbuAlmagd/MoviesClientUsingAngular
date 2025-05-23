@@ -12,6 +12,8 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private isBrowser: boolean;
+  private readonly TOKEN_KEY = 'token';
+  private readonly USER_KEY = 'currentUser';
 
   constructor(
     private http: HttpClient,
@@ -19,40 +21,56 @@ export class AuthService {
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     if (this.isBrowser) {
-      try {
-        const user = localStorage.getItem('currentUser');
-        if (user) {
-          const parsedUser = JSON.parse(user);
-          if (parsedUser) {
-            this.currentUserSubject.next(parsedUser);
-          }
-        }
-      } catch (error) {
-        console.error('Error parsing user data from localStorage:', error);
-        localStorage.removeItem('currentUser');
-        this.currentUserSubject.next(null);
-      }
+      this.loadStoredUser();
     }
+  }
+
+  private loadStoredUser(): void {
+    try {
+      const user = localStorage.getItem(this.USER_KEY);
+      const token = localStorage.getItem(this.TOKEN_KEY);
+      if (user && token) {
+        const parsedUser = JSON.parse(user);
+        if (parsedUser) {
+          this.currentUserSubject.next(parsedUser);
+        }
+      } else {
+        this.clearStoredData();
+      }
+    } catch (error) {
+      console.error('Error loading stored user data:', error);
+      this.clearStoredData();
+    }
+  }
+
+  private clearStoredData(): void {
+    if (this.isBrowser) {
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem(this.USER_KEY);
+    }
+    this.currentUserSubject.next(null);
+  }
+
+  private storeAuthData(response: AuthResponse): void {
+    if (this.isBrowser) {
+      localStorage.setItem(this.TOKEN_KEY, response.token);
+      localStorage.setItem(this.USER_KEY, JSON.stringify({
+        username: response.userName,
+        email: response.email,
+        roles: response.roles
+      }));
+    }
+    this.currentUserSubject.next({
+      username: response.userName,
+      email: response.email,
+      roles: response.roles
+    });
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/api/auth/login`, request)
       .pipe(
-        tap(response => {
-          if (this.isBrowser) {
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('currentUser', JSON.stringify({
-              username: response.userName,
-              email: response.email,
-              roles: response.roles
-            }));
-          }
-          this.currentUserSubject.next({
-            username: response.userName,
-            email: response.email,
-            roles: response.roles
-          });
-        }),
+        tap(response => this.storeAuthData(response)),
         catchError(error => {
           console.error('Login error:', error);
           return throwError(() => error);
@@ -63,21 +81,7 @@ export class AuthService {
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${environment.apiUrl}/api/auth/register`, request)
       .pipe(
-        tap(response => {
-          if (this.isBrowser) {
-            localStorage.setItem('token', response.token);
-            localStorage.setItem('currentUser', JSON.stringify({
-              username: response.userName,
-              email: response.email,
-              roles: response.roles
-            }));
-          }
-          this.currentUserSubject.next({
-            username: response.userName,
-            email: response.email,
-            roles: response.roles
-          });
-        }),
+        tap(response => this.storeAuthData(response)),
         catchError(error => {
           console.error('Registration error:', error);
           return throwError(() => error);
@@ -86,15 +90,11 @@ export class AuthService {
   }
 
   logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('currentUser');
-    }
-    this.currentUserSubject.next(null);
+    this.clearStoredData();
   }
 
   isAuthenticated(): boolean {
-    return !!this.currentUserSubject.value;
+    return !!this.getToken() && !!this.currentUserSubject.value;
   }
 
   isAdmin(): boolean {
@@ -102,7 +102,7 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return this.isBrowser ? localStorage.getItem('token') : null;
+    return this.isBrowser ? localStorage.getItem(this.TOKEN_KEY) : null;
   }
 
   getUserId(): number | null {

@@ -1,0 +1,113 @@
+<div class="movie-list-container">
+  <!-- Search and Filter Section -->
+  <section class="search-filter-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="search-box">
+            <i class="material-icons">search</i>
+            <input type="text" 
+                   [(ngModel)]="searchQuery" 
+                   (keyup.enter)="onSearch(searchQuery)"
+                   placeholder="Search movies...">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="category-filter">
+            <select [(ngModel)]="selectedCategory" (change)="onCategoryChange(selectedCategory)">
+              <option [ngValue]="null">All Categories</option>
+              <option *ngFor="let category of categories" [value]="category.id">
+                {{category.name}}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Movies Grid Section -->
+  <section class="movies-grid-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-12" *ngIf="isLoading">
+          <div class="loading-spinner">
+            <i class="material-icons">movie</i>
+            <span>Loading movies...</span>
+          </div>
+        </div>
+        <div class="col-12" *ngIf="error">
+          <div class="error-message">
+            <i class="material-icons">error</i>
+            <span>{{error}}</span>
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3" *ngFor="let movie of movies">
+          <div class="movie-card">
+            <div class="movie-poster">
+              <img [src]="movie.poster" [alt]="movie.title">
+              <div class="movie-rating">
+                <i class="material-icons">star</i>
+                <span>{{movie.rating}}/10</span>
+              </div>
+              <div class="movie-actions-overlay">
+                <button *ngIf="authService.currentUser$ | async"
+                        class="btn btn-icon watchlist-btn"
+                        [class.active]="watchlistStatus[movie.id]"
+                        (click)="toggleWatchlist(movie.id)">
+                  <i class="material-icons">{{ watchlistStatus[movie.id] ? 'favorite' : 'favorite_border' }}</i>
+                </button>
+              </div>
+            </div>
+            <div class="movie-info">
+              <h3 class="movie-title">{{movie.title}}</h3>
+              <p class="movie-release-date">
+                <i class="material-icons">calendar_today</i>
+                {{movie.releaseDate | date}}
+              </p>
+              <div class="movie-categories">
+                <span *ngFor="let category of movie.categories" class="category-badge">
+                  {{category.name}}
+                </span>
+              </div>
+              <p class="movie-description">{{movie.description | slice:0:100}}...</p>
+              <div class="movie-actions">
+                <button *ngIf="authService.currentUser$ | async"
+                        class="btn btn-icon watchlist-btn"
+                        [class.active]="watchlistStatus[movie.id]"
+                        (click)="toggleWatchlist(movie.id)">
+                  <i class="material-icons">{{ watchlistStatus[movie.id] ? 'favorite' : 'favorite_border' }}</i>
+                  <span>{{ watchlistStatus[movie.id] ? 'Remove from Watchlist' : 'Add to Watchlist' }}</span>
+                </button>
+                <a [routerLink]="['/movies', movie.id]" class="btn btn-primary">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pagination Section -->
+  <section class="pagination-section" *ngIf="totalPages > 1">
+    <div class="container">
+      <div class="pagination">
+        <button class="btn btn-outline-light" 
+                [disabled]="currentPage === 1"
+                (click)="onPageChange(currentPage - 1)">
+          <i class="material-icons">chevron_left</i>
+          Previous
+        </button>
+        <span class="page-info">Page {{currentPage}} of {{totalPages}}</span>
+        <button class="btn btn-outline-light"
+                [disabled]="currentPage === totalPages"
+                (click)="onPageChange(currentPage + 1)">
+          Next
+          <i class="material-icons">chevron_right</i>
+        </button>
+      </div>
+    </div>
+  </section>
+</div> 

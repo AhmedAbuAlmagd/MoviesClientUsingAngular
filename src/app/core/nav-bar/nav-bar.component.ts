@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { User } from '../models/auth.model';
 
 @Component({
   selector: 'app-nav-bar',
@@ -8,10 +9,16 @@ import { AuthService } from '../services/auth.service';
   styleUrls: ['./nav-bar.component.scss']
 })
 export class NavBarComponent {
+  currentUser: User | null = null;
+
   constructor(
     private router: Router,
-    private authService: AuthService
-  ) {}
+    public authService: AuthService
+  ) {
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
 
   navigateToMovies(): void {
     this.router.navigate(['/movies']);
@@ -35,10 +42,6 @@ export class NavBarComponent {
 
   isAdmin(): boolean {
     return this.authService.isAdmin();
-  }
-
-  getCurrentUser() {
-    return this.authService['currentUserSubject'].value;
   }
 
   logout(): void {

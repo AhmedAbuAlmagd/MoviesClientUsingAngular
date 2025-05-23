@@ -1,0 +1,78 @@
+<div class="movie-details-container" *ngIf="movie">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-4">
+            <div class="movie-poster">
+              <img [src]="movie.poster" class="img-fluid rounded" [alt]="movie.title">
+              <div class="movie-rating">
+                <i class="material-icons">star</i>
+                <span>{{movie.rating}}/10</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <h1 class="movie-title">{{movie.title}}</h1>
+            <p class="movie-release-date">
+              <i class="material-icons">calendar_today</i>
+              Released: {{movie.releaseDate | date}}
+            </p>
+            <div class="movie-categories">
+              <span *ngFor="let category of movie.categories"
+                    class="category-badge">
+                <i class="material-icons">{{ getCategoryIcon(category.name) }}</i>
+                <span>{{category.name}}</span>
+              </span>
+            </div>
+            <p class="movie-description">{{movie.description}}</p>
+            <div class="movie-actions">
+              <button *ngIf="authService.currentUser$ | async" 
+                      class="btn" 
+                      [class.btn-outline-light]="!isInWatchlist"
+                      [class.btn-danger]="isInWatchlist"
+                      (click)="toggleWatchlist()">
+                <i class="material-icons">{{ isInWatchlist ? 'favorite' : 'favorite_border' }}</i>
+                {{ isInWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist' }}
+              </button>
+              <ng-container *ngIf="isAdmin()">
+                <a [routerLink]="['/movies/edit', movie.id]" class="btn btn-outline-light me-2">
+                  <i class="material-icons">edit</i> Edit
+                </a>
+                <button class="btn btn-danger" (click)="deleteMovie()">
+                  <i class="material-icons">delete</i> Delete
+                </button>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trailer Section -->
+  <section class="trailer-section" *ngIf="movie.trailer">
+    <div class="container">
+      <div class="section-header">
+        <h2><i class="material-icons">movie</i> Trailer</h2>
+      </div>
+      <div class="trailer-container">
+        <video [src]="movie.trailer" controls class="w-100 rounded"></video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section class="reviews-section">
+    <div class="container">
+      <div class="section-header">
+        <h2><i class="material-icons">rate_review</i> Reviews</h2>
+      </div>
+      <div class="review-form-container mb-4" *ngIf="isAuthenticated() && !isAdmin()">
+        <app-review-form [movieId]="movie.id" (reviewAdded)="loadReviews()"></app-review-form>
+      </div>
+      <app-review-list [movieId]="movie.id" #reviewList></app-review-list>
+    </div>
+  </section>
+</div> 
